@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Navigation, Pagination, EffectFade } from 'swiper/modules';
@@ -8,10 +9,8 @@ import SectionTitle from '../components/SectionTitle';
 import Button from '../components/Button';
 import AchievementCard from '../components/AchievementCard';
 import BlogCard from '../components/BlogCard';
-import achievementsData from '../data/achievements.json';
-import eventsData from '../data/events.json';
+import { useAchievements, useAnnouncements, useBlogs, useEvents } from '../hooks/useContent';
 import { getUpcomingEvents } from '../utils/eventStatus';
-import blogsData from '../data/blogs.json';
 
 // Import Swiper styles
 import 'swiper/css';
@@ -53,8 +52,18 @@ export default function HomePage() {
   const [aboutRef, aboutInView] = useInView({ triggerOnce: true, threshold: 0.1 });
   const [achievementsRef, achievementsInView] = useInView({ triggerOnce: true, threshold: 0.1 });
   const [blogRef, blogInView] = useInView({ triggerOnce: true, threshold: 0.1 });
-  const upcomingEvents = getUpcomingEvents(eventsData);
-  const featuredEvent = upcomingEvents[0];
+  const { data: eventsData, loading: eventsLoading } = useEvents();
+  const { data: achievementsData } = useAchievements();
+  const { data: blogsData } = useBlogs();
+  const { data: announcementsData } = useAnnouncements();
+  const [dismissedAnnouncementId, setDismissedAnnouncementId] = useState(null);
+
+  const achievements = achievementsData ?? [];
+  const blogs = blogsData ?? [];
+  const announcement = (announcementsData ?? [])[0];
+  const upcomingEvents = getUpcomingEvents(eventsData ?? []);
+  const featuredEvent = upcomingEvents.find((event) => event.featured) ?? upcomingEvents[0];
+  const showAnnouncement = announcement && announcement.id !== dismissedAnnouncementId;
 
   return (
     <div className="home-page min-h-screen bg-[#FAFAFA]">
@@ -139,6 +148,28 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Active announcement */}
+      {showAnnouncement && (
+        <section className="px-6 pt-10 lg:px-8">
+          <div className="home-announcement mx-auto flex max-w-7xl flex-col gap-3 rounded-2xl border border-[#cfe6cb] bg-[#eef7ea] px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#548545]">Announcement</p>
+              <p className="mt-1 font-semibold text-[#20372a]">{announcement.title}</p>
+              {announcement.content && (
+                <p className="mt-1 text-sm leading-6 text-[#45634c]">{announcement.content}</p>
+              )}
+            </div>
+            <button
+              type="button"
+              onClick={() => setDismissedAnnouncementId(announcement.id)}
+              className="self-start rounded-full border border-[#a9c9a2] px-4 py-2 text-sm font-semibold text-[#31523a] transition hover:bg-white sm:self-auto"
+            >
+              Dismiss
+            </button>
+          </div>
+        </section>
+      )}
+
       {/* Featured upcoming event */}
       <section className="home-featured-events bg-white px-6 pb-20 pt-16 lg:px-8 lg:pb-24">
         <div className="mx-auto max-w-7xl">
@@ -152,7 +183,17 @@ export default function HomePage() {
             </Link>
           </div>
 
-          {featuredEvent ? (
+          {eventsLoading && !featuredEvent ? (
+            <div className="home-featured-event-card grid min-h-80 animate-pulse overflow-hidden rounded-[1.75rem] border border-[#e6eee7] bg-[#f6f9f4] md:grid-cols-[0.95fr_1.05fr]" aria-hidden="true">
+              <div className="hidden bg-[#dce8d4] md:block" />
+              <div className="space-y-4 p-8 sm:p-12">
+                <div className="h-4 w-32 rounded bg-[#dce8d4]" />
+                <div className="h-9 w-4/5 rounded bg-[#dce8d4]" />
+                <div className="h-4 w-full rounded bg-[#e4eee0]" />
+                <div className="h-4 w-3/4 rounded bg-[#e4eee0]" />
+              </div>
+            </div>
+          ) : featuredEvent ? (
             <motion.article
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -330,23 +371,29 @@ export default function HomePage() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="mt-12"
           >
-            <Swiper
-              modules={[Autoplay]}
-              spaceBetween={24}
-              slidesPerView={1}
-              breakpoints={{
-                640: { slidesPerView: 2 },
-                1024: { slidesPerView: 3 },
-              }}
-              autoplay={{ delay: 4000, disableOnInteraction: false }}
-              loop
-            >
-              {achievementsData.map((achievement, index) => (
-                <SwiperSlide key={achievement.id}>
-                  <AchievementCard achievement={achievement} index={index} />
-                </SwiperSlide>
-              ))}
-            </Swiper>
+            {achievements.length > 0 ? (
+              <Swiper
+                modules={[Autoplay]}
+                spaceBetween={24}
+                slidesPerView={1}
+                breakpoints={{
+                  640: { slidesPerView: 2 },
+                  1024: { slidesPerView: 3 },
+                }}
+                autoplay={{ delay: 4000, disableOnInteraction: false }}
+                loop
+              >
+                {achievements.map((achievement, index) => (
+                  <SwiperSlide key={achievement.id}>
+                    <AchievementCard achievement={achievement} index={index} />
+                  </SwiperSlide>
+                ))}
+              </Swiper>
+            ) : (
+              <p className="py-8 text-center text-muted">
+                Achievements will appear here once they are published.
+              </p>
+            )}
           </motion.div>
         </div>
       </section>
@@ -366,9 +413,13 @@ export default function HomePage() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="mt-12 grid md:grid-cols-3 gap-8"
           >
-            {blogsData.slice(0, 3).map((blog, index) => (
+            {blogs.length > 0 ? blogs.slice(0, 3).map((blog, index) => (
               <BlogCard key={blog.id} blog={blog} index={index} />
-            ))}
+            )) : (
+              <p className="col-span-full text-center text-muted">
+                New stories will appear here soon.
+              </p>
+            )}
           </motion.div>
         </div>
       </section>

@@ -7,6 +7,11 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
+    "test": "node --test tests/*.test.js",
+    "migrate:content": "node scripts/migrate-content.mjs",
+    "migrate:content:dry": "node scripts/migrate-content.mjs --dry-run",
+    "create:admin": "node scripts/create-admin.mjs",
+    "verify:security": "node scripts/verify-security.mjs",
     "optimize:images": "node scripts/optimize-images.mjs",
     "optimize:images:content": "node scripts/optimize-images.mjs --force --folders=gallery,events,blogs,achievements",
     "optimize:images:force": "node scripts/optimize-images.mjs --force",
@@ -14,6 +19,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.119.0",
     "@tailwindcss/vite": "^4.1.7",
     "framer-motion": "^12.42.2",
     "lucide-react": "^0.511.0",

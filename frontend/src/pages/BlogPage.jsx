@@ -1,24 +1,41 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { FiSearch } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
 import SectionTitle from '../components/SectionTitle';
 import BlogCard from '../components/BlogCard';
 import Button from '../components/Button';
-import blogsData from '../data/blogs.json';
+import { useBlogs } from '../hooks/useContent';
 
-const categories = ['All', 'Sustainability', 'Conservation', 'Climate', 'Technology', 'Waste Management', 'Water'];
+const baseCategories = ['Sustainability', 'Conservation', 'Climate', 'Technology', 'Waste Management', 'Water'];
 
 export default function BlogPage() {
+  const { data: blogsData, loading, error, refetch } = useBlogs();
   const [activeCategory, setActiveCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
 
-  const filteredBlogs = blogsData.filter(blog => {
-    const matchesCategory = activeCategory === 'All' || blog.category === activeCategory;
-    const matchesSearch = blog.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         blog.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesCategory && matchesSearch;
-  });
+  const blogs = useMemo(() => blogsData ?? [], [blogsData]);
+  const featuredBlog = blogs[0];
+
+  const categories = useMemo(() => {
+    const extra = blogs
+      .map((blog) => blog.category)
+      .filter((category) => category && category !== 'All');
+
+    return ['All', ...new Set([...baseCategories, ...extra])];
+  }, [blogs]);
+
+  const filteredBlogs = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+
+    return blogs.filter((blog) => {
+      const matchesCategory = activeCategory === 'All' || blog.category === activeCategory;
+      const matchesSearch = !query
+        || blog.title.toLowerCase().includes(query)
+        || blog.excerpt.toLowerCase().includes(query);
+      return matchesCategory && matchesSearch;
+    });
+  }, [activeCategory, blogs, searchQuery]);
 
   return (
     <div className="min-h-screen bg-[#FAFAFA] pt-20">
@@ -33,37 +50,45 @@ export default function BlogPage() {
       </section>
 
       {/* Featured Post */}
-      <section className="py-12 px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="bg-white rounded-2xl overflow-hidden shadow-soft">
-            <div className="flex flex-col lg:flex-row">
-              <div className="lg:w-1/2">
-                <img
-                  src={blogsData[0].image}
-                  alt={blogsData[0].title}
-                  className="w-full h-64 lg:h-full object-cover"
-                  loading="lazy"
-                />
-              </div>
-              <div className="lg:w-1/2 p-8 lg:p-12">
-                <span className="text-sm font-medium text-[#3FAE5C] mb-2 block">Featured</span>
-                <h2 className="text-3xl font-bold text-[#222] mb-4">{blogsData[0].title}</h2>
-                <p className="text-muted mb-6">{blogsData[0].excerpt}</p>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted">{blogsData[0].date}</span>
-                  <Link
-                    to={`/blog/${blogsData[0].id}`}
-                    state={{ from: '/blog' }}
-                    className="text-[#3FAE5C] font-medium hover:underline"
-                  >
-                    Read More
-                  </Link>
+      {featuredBlog && (
+        <section className="py-12 px-6 lg:px-8">
+          <div className="max-w-7xl mx-auto">
+            <div className="bg-white rounded-2xl overflow-hidden shadow-soft">
+              <div className="flex flex-col lg:flex-row">
+                <div className="lg:w-1/2">
+                  {featuredBlog.image ? (
+                    <img
+                      src={featuredBlog.image}
+                      alt={featuredBlog.title}
+                      className="w-full h-64 lg:h-full object-cover"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div className="flex h-64 w-full items-center justify-center bg-gradient-to-br from-[#e8f3e4] to-[#cfe6cb] lg:h-full">
+                      <span className="text-sm font-medium text-[#3FAE5C]">Eco Club Blog</span>
+                    </div>
+                  )}
+                </div>
+                <div className="lg:w-1/2 p-8 lg:p-12">
+                  <span className="text-sm font-medium text-[#3FAE5C] mb-2 block">Featured</span>
+                  <h2 className="text-3xl font-bold text-[#222] mb-4">{featuredBlog.title}</h2>
+                  <p className="text-muted mb-6">{featuredBlog.excerpt}</p>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-muted">{featuredBlog.date}</span>
+                    <Link
+                      to={`/blog/${featuredBlog.id}`}
+                      state={{ from: '/blog' }}
+                      className="text-[#3FAE5C] font-medium hover:underline"
+                    >
+                      Read More
+                    </Link>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Filters and Search */}
       <section className="py-8 px-6 lg:px-8">
@@ -104,6 +129,26 @@ export default function BlogPage() {
       {/* Blog Grid */}
       <section className="py-12 px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
+          {loading && blogs.length === 0 && (
+            <div className="flex flex-col items-center justify-center gap-4 py-16">
+              <div className="h-10 w-10 animate-spin rounded-full border-4 border-[#3FAE5C] border-t-transparent" />
+              <p className="text-muted">Loading blog posts…</p>
+            </div>
+          )}
+
+          {!loading && error && blogs.length === 0 && (
+            <div className="mx-auto max-w-xl rounded-2xl border border-[#ECECEC] bg-white p-8 text-center shadow-card">
+              <p className="text-xl font-semibold text-[#222]">We couldn’t load the blog.</p>
+              <button
+                type="button"
+                onClick={() => refetch()}
+                className="mt-5 rounded-full bg-[#3FAE5C] px-6 py-2.5 font-medium text-white transition hover:bg-[#359a4f]"
+              >
+                Try again
+              </button>
+            </div>
+          )}
+
           <motion.div
             layout
             className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
@@ -113,9 +158,13 @@ export default function BlogPage() {
             ))}
           </motion.div>
 
-          {filteredBlogs.length === 0 && (
+          {!loading && filteredBlogs.length === 0 && (
             <div className="text-center py-12">
-              <p className="text-xl text-muted">No blogs found matching your criteria.</p>
+              <p className="text-xl text-muted">
+                {blogs.length === 0
+                  ? 'No blog posts have been published yet.'
+                  : 'No blogs found matching your criteria.'}
+              </p>
             </div>
           )}
         </div>
