@@ -3,7 +3,7 @@ VITE_SUPABASE_ANON_KEY=<anon-or-publishable-key>`;
 
 export default function AdminSetupRequired() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#FAFAFA] px-5 py-12">
+    <div className="admin-setup-required flex min-h-screen items-center justify-center bg-[#FAFAFA] px-5 py-12">
       <div className="w-full max-w-2xl rounded-3xl border border-[#ECECEC] bg-white p-7 shadow-soft sm:p-10">
         <span className="inline-flex items-center gap-2 rounded-full bg-[#eef7ea] px-4 py-1.5 text-xs font-bold uppercase tracking-[0.16em] text-[#3F7A3A]">
           Setup required

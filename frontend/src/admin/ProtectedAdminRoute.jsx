@@ -12,7 +12,7 @@ export default function ProtectedAdminRoute({ children }) {
 
   if (access === 'loading') {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-[#FAFAFA]">
+      <div className="protected-admin-route flex min-h-screen flex-col items-center justify-center gap-4 bg-[#FAFAFA]">
         <div className="h-10 w-10 animate-spin rounded-full border-4 border-[#3FAE5C] border-t-transparent" />
         <p className="text-muted">Checking administrator access…</p>
       </div>
@@ -25,7 +25,7 @@ export default function ProtectedAdminRoute({ children }) {
 
   if (access === 'denied') {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#FAFAFA] px-5 py-12">
+      <div className="protected-admin-route flex min-h-screen items-center justify-center bg-[#FAFAFA] px-5 py-12">
         <div className="w-full max-w-lg rounded-3xl border border-[#ECECEC] bg-white p-8 text-center shadow-soft">
           <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-amber-100 text-amber-700">
             <FiShield className="h-6 w-6" aria-hidden="true" />

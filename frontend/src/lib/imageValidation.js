@@ -18,6 +18,7 @@ export const BUCKET_MAX_BYTES = {
 };
 
 export const DEFAULT_MAX_BYTES = 5 * 1024 * 1024;
+export const SOURCE_MAX_BYTES = 25 * 1024 * 1024;
 
 export function formatBytes(bytes) {
   if (!bytes) return '0 KB';

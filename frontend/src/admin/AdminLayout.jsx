@@ -11,7 +11,9 @@ import {
   FiImage,
   FiLogOut,
   FiMenu,
+  FiMoon,
   FiSettings,
+  FiSun,
   FiUsers,
   FiX,
 } from 'react-icons/fi';
@@ -47,12 +49,37 @@ const titles = {
 export default function AdminLayout() {
   const { session, adminRecord, signOut } = useAdminAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [darkMode, setDarkMode] = useState(() => {
+    try {
+      return localStorage.getItem('eco-theme') === 'dark'
+        || document.documentElement.classList.contains('dark');
+    } catch {
+      return document.documentElement.classList.contains('dark');
+    }
+  });
   const location = useLocation();
   const page = titles[location.pathname] ?? { title: 'Dashboard', subtitle: '' };
 
   useEffect(() => {
     setMobileOpen(false);
   }, [location.pathname]);
+
+  const toggleTheme = () => {
+    setDarkMode((current) => {
+      const next = !current;
+      document.documentElement.classList.toggle('dark', next);
+      document.documentElement.style.colorScheme = next ? 'dark' : 'light';
+      window.dispatchEvent(new CustomEvent('eco-theme-change', {
+        detail: next ? 'dark' : 'light',
+      }));
+      try {
+        localStorage.setItem('eco-theme', next ? 'dark' : 'light');
+      } catch {
+        // The current document still changes when storage is unavailable.
+      }
+      return next;
+    });
+  };
 
   const displayName = adminRecord?.display_name || session?.user?.email || 'Administrator';
   const initials = displayName
@@ -168,6 +195,14 @@ export default function AdminLayout() {
               </div>
 
               <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={toggleTheme}
+                  aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+                  className="rounded-xl border border-[#ECECEC] p-2 text-[#222] transition hover:border-[#3FAE5C] dark:border-[#34443B] dark:text-[#E6EFE9]"
+                >
+                  {darkMode ? <FiSun className="h-4 w-4" /> : <FiMoon className="h-4 w-4" />}
+                </button>
                 <span className="hidden max-w-48 truncate text-sm font-medium text-muted md:block">
                   {displayName}
                 </span>

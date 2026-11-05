@@ -1,9 +1,8 @@
 import { useRef, useState } from 'react';
 import { FiImage, FiUploadCloud, FiX } from 'react-icons/fi';
 import {
-  BUCKET_MAX_BYTES,
-  DEFAULT_MAX_BYTES,
   IMAGE_ACCEPT,
+  SOURCE_MAX_BYTES,
   formatBytes,
   uploadImage,
   validateImageFile,
@@ -14,14 +13,12 @@ export default function ImageUploadField({ id, bucket, value, onChange, error })
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [uploadError, setUploadError] = useState('');
-  const maxBytes = BUCKET_MAX_BYTES[bucket] ?? DEFAULT_MAX_BYTES;
-
   const handleFile = async (event) => {
     const file = event.target.files?.[0];
     event.target.value = '';
     if (!file) return;
 
-    const validation = validateImageFile(file, maxBytes);
+    const validation = validateImageFile(file, SOURCE_MAX_BYTES);
     if (!validation.valid) {
       setUploadError(validation.error);
       return;
@@ -92,7 +89,7 @@ export default function ImageUploadField({ id, bucket, value, onChange, error })
           </div>
 
           <p className="mt-2 text-xs text-muted">
-            JPG, PNG, WebP, GIF or AVIF. Maximum {formatBytes(maxBytes)}.
+            JPG, PNG, WebP, GIF or AVIF. Up to {formatBytes(SOURCE_MAX_BYTES)} before compression.
           </p>
 
           {uploading && (

@@ -2,7 +2,7 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { FiArrowUpRight, FiMapPin, FiPackage } from 'react-icons/fi';
 import { FaLeaf } from 'react-icons/fa';
 
-const PREORDER_URL = ''; // Add the preorder destination here when it is ready.
+const PREORDER_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSexGY0aeydanQCLMAcfdFA6qyvIS4WQEnRiAy5Fj2tk_Y-dmQ/viewform'; // Add the preorder destination here when it is ready.
 const MERCH_REVEAL_URL = 'https://www.canva.com/design/DAHZOSUX61w/Cja8NS6KNjqsC0YGeSsQGQ/view?embed';
 const MERCH_VIDEO = '/merch/merch.mp4';
 const MERCH_POSTER = '/merch/merch-poster.jpg';
@@ -42,7 +42,7 @@ export default function MerchPage() {
           >
             <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-[#D6F38B]">
               <span className="h-2 w-2 rounded-full bg-[#C7F65B]" />
-              The 2026 drop · Coming soon
+              The 2026 drop
             </span>
             <p className="mt-8 text-sm font-semibold uppercase tracking-[0.3em] text-[#B8D9A6]">Eco Club NITS presents</p>
             <h1 className="mt-4 max-w-2xl text-5xl font-black leading-[1.04] sm:text-6xl lg:text-7xl">
@@ -62,19 +62,19 @@ export default function MerchPage() {
                   href={PREORDER_URL}
                   className="inline-flex items-center gap-2 rounded-full bg-[#C7F65B] px-6 py-3 font-bold text-[#173E2B] transition hover:bg-white"
                 >
-                  Pre-order the tee <FiArrowUpRight aria-hidden="true" />
+                  Order the tee <FiArrowUpRight aria-hidden="true" />
                 </a>
               ) : (
                 <button
                   type="button"
                   disabled
                   className="cursor-not-allowed rounded-full bg-[#C7F65B] px-6 py-3 font-bold text-[#173E2B] opacity-90"
-                  aria-label="Pre-orders coming soon"
+                  aria-label="Orders available"
                 >
-                  Pre-orders coming soon
+                  Orders available
                 </button>
               )}
-              <span className="text-sm text-white/60">The preorder link will be added here.</span>
+              <span className="text-sm text-white/60">Order your T-shirt here.</span>
             </div>
           </motion.div>
 

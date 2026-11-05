@@ -265,6 +265,86 @@
     background-color: #111916;
   }
 
+  html.dark .admin-shell header.bg-white\/95 {
+    background-color: rgba(24, 34, 30, 0.96);
+    border-color: #34443B;
+  }
+
+  html.dark .admin-shell .bg-white\/95 {
+    background-color: rgba(24, 34, 30, 0.96);
+  }
+
+  html.dark .admin-shell .border-\[\#ECECEC\],
+  html.dark .admin-shell .border-\[\#c9d6c4\] {
+    border-color: #34443B;
+  }
+
+  html.dark .admin-shell .text-\[\#222\],
+  html.dark .admin-shell .text-\[\#45634c\] {
+    color: #E6EFE9;
+  }
+
+  html.dark .admin-shell .bg-red-50 {
+    background-color: #3a2022;
+  }
+
+  html.dark .admin-shell .text-red-700 {
+    color: #ffb4b4;
+  }
+
+  html.dark .admin-shell .border-red-100,
+  html.dark .admin-shell .border-red-200 {
+    border-color: #6b3838;
+  }
+
+  html.dark .admin-shell .hover\:bg-\[\#f7f9f5\]:hover,
+  html.dark .admin-shell .hover\:bg-\[\#f3f6f2\]:hover,
+  html.dark .admin-shell .hover\:bg-\[\#fbfdf9\]:hover {
+    background-color: #26352D;
+  }
+
+  html.dark .admin-shell .hover\:bg-red-50:hover {
+    background-color: #4a2729;
+  }
+
+  html.dark .admin-shell .divide-\[\#eef2ec\] > :not(:last-child) {
+    border-color: #34443B;
+  }
+
+  html.dark .admin-shell .shadow-sm,
+  html.dark .admin-shell .shadow-2xl {
+    --tw-shadow-color: rgba(0, 0, 0, 0.35);
+  }
+
+  html.dark .admin-shell option {
+    background-color: #18221E;
+    color: #F1F5F3;
+  }
+
+  html.dark .admin-shell ::selection {
+    background-color: #3FAE5C;
+    color: #fff;
+  }
+
+  html.dark body:has(.admin-login),
+  html.dark body:has(.admin-setup-required),
+  html.dark body:has(.protected-admin-route) {
+    background-color: #111916;
+  }
+
+  html.dark .admin-login,
+  html.dark .admin-setup-required,
+  html.dark .protected-admin-route {
+    background-color: #111916;
+    color: #E6EFE9;
+  }
+
+  html.dark .admin-login .bg-white,
+  html.dark .admin-setup-required .bg-white,
+  html.dark .protected-admin-route .bg-white {
+    background-color: #18221E;
+  }
+
   html.dark .home-featured-events {
     background-color: #111916;
   }

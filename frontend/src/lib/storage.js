@@ -3,6 +3,7 @@ import {
   BUCKET_MAX_BYTES,
   DEFAULT_MAX_BYTES,
   IMAGE_ACCEPT,
+  SOURCE_MAX_BYTES,
   formatBytes,
   validateImageFile,
 } from './imageValidation';
@@ -17,17 +18,10 @@ export {
   BUCKET_MAX_BYTES,
   DEFAULT_MAX_BYTES,
   IMAGE_ACCEPT,
+  SOURCE_MAX_BYTES,
   formatBytes,
   validateImageFile,
 };
-
-function extensionFor(file) {
-  const fromName = file.name.split('.').pop()?.toLowerCase();
-  if (fromName && /^[a-z0-9]{2,5}$/.test(fromName)) return fromName;
-
-  const fromMime = file.type.split('/').pop();
-  return fromMime === 'jpeg' ? 'jpg' : (fromMime || 'jpg');
-}
 
 export function buildStoragePath(file) {
   const month = new Date().toISOString().slice(0, 7);
@@ -36,7 +30,60 @@ export function buildStoragePath(file) {
     ? crypto.randomUUID()
     : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 
-  return `${month}/${unique}-${base}.${extensionFor(file)}`;
+  return `${month}/${unique}-${base}.webp`;
+}
+
+const WEBP_QUALITY = 0.82;
+const MAX_IMAGE_DIMENSION = 2400;
+
+function loadImage(file) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const image = new Image();
+    image.onload = () => {
+      URL.revokeObjectURL(url);
+      resolve(image);
+    };
+    image.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error('The selected file could not be decoded as an image.'));
+    };
+    image.src = url;
+  });
+}
+
+/**
+ * Converts uploaded raster images to bounded WebP files before storage.
+ * The source limit is intentionally higher than the storage limit because
+ * compression happens before the bucket-size check.
+ */
+export async function compressImageToWebp(file, maxBytes = DEFAULT_MAX_BYTES) {
+  if (!file || file.size > SOURCE_MAX_BYTES) {
+    throw new Error(`Image is too large. Maximum source size is ${formatBytes(SOURCE_MAX_BYTES)}.`);
+  }
+
+  const image = await loadImage(file);
+  const scale = Math.min(1, MAX_IMAGE_DIMENSION / Math.max(image.naturalWidth, image.naturalHeight));
+  const canvas = document.createElement('canvas');
+  canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
+  canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
+
+  const context = canvas.getContext('2d');
+  if (!context) throw new Error('Your browser cannot prepare this image for upload.');
+  context.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+  const blob = await new Promise((resolve) => {
+    canvas.toBlob(resolve, 'image/webp', WEBP_QUALITY);
+  });
+  if (!blob) throw new Error('The image could not be converted to WebP.');
+  if (blob.size > maxBytes) {
+    throw new Error(`Compressed image is still too large. Maximum is ${formatBytes(maxBytes)}.`);
+  }
+
+  return new File([blob], `${file.name.replace(/\.[^.]+$/, '')}.webp`, {
+    type: 'image/webp',
+    lastModified: Date.now(),
+  });
 }
 
 export function publicUrlFor(bucket, path) {
@@ -72,15 +119,16 @@ export async function uploadImage(bucket, file, onProgress) {
   }
 
   const maxBytes = BUCKET_MAX_BYTES[bucket] ?? DEFAULT_MAX_BYTES;
-  const validation = validateImageFile(file, maxBytes);
+  const validation = validateImageFile(file, SOURCE_MAX_BYTES);
   if (!validation.valid) throw new Error(validation.error);
+  const uploadFile = await compressImageToWebp(file, maxBytes);
 
   const { data: { session }, error: sessionError } = await supabase.auth.getSession();
   if (sessionError || !session?.access_token) {
     throw new Error('Your admin session has expired. Please sign in again.');
   }
 
-  const path = buildStoragePath(file);
+  const path = buildStoragePath(uploadFile);
   const endpoint = `${supabaseUrl}/storage/v1/object/${bucket}/${path}`;
 
   return new Promise((resolve, reject) => {
@@ -88,7 +136,7 @@ export async function uploadImage(bucket, file, onProgress) {
     request.open('POST', endpoint);
     request.setRequestHeader('Authorization', `Bearer ${session.access_token}`);
     request.setRequestHeader('apikey', supabaseAnonKey);
-    request.setRequestHeader('Content-Type', file.type);
+    request.setRequestHeader('Content-Type', uploadFile.type);
     request.setRequestHeader('Cache-Control', '31536000');
     request.setRequestHeader('x-upsert', 'false');
 
@@ -109,7 +157,7 @@ export async function uploadImage(bucket, file, onProgress) {
     };
 
     request.onerror = () => reject(new Error('Image upload failed. Check your connection.'));
-    request.send(file);
+    request.send(uploadFile);
   });
 }
 

@@ -1,5 +1,6 @@
 import { existsSync, readFileSync, statSync } from 'node:fs';
-import { extname, join } from 'node:path';
+import { join } from 'node:path';
+import sharp from 'sharp';
 import { createClient } from '@supabase/supabase-js';
 import { envValue, frontendRoot, loadEnvFiles, parseArgs, requireEnv } from './env.mjs';
 import { makeUniqueSlug, slugify } from '../src/lib/contentMapper.js';
@@ -14,15 +15,6 @@ const help = flags.has('--help');
 
 const dataDir = join(frontendRoot, 'src', 'data');
 const publicDir = join(frontendRoot, 'public');
-
-const MIME_TYPES = {
-  '.webp': 'image/webp',
-  '.png': 'image/png',
-  '.jpg': 'image/jpeg',
-  '.jpeg': 'image/jpeg',
-  '.gif': 'image/gif',
-  '.avif': 'image/avif',
-};
 
 const readJson = (file) => JSON.parse(readFileSync(join(dataDir, file), 'utf8'));
 
@@ -61,24 +53,49 @@ async function uploadAsset(bucket, url, label) {
 
   const objectPath = url.replace(/^\//, '');
   const size = Math.round(statSync(sourcePath).size / 1024);
+  const sourceBuffer = readFileSync(sourcePath);
+  const webpBuffer = await sharp(sourceBuffer)
+    .rotate()
+    .resize({ width: 2400, height: 2400, fit: 'inside', withoutEnlargement: true })
+    .webp({ quality: 82 })
+    .toBuffer();
+  const webpObjectPath = objectPath.replace(/\.[^.]+$/, '.webp');
 
   if (dryRun) {
-    console.log(`  plan upload  ${bucket}/${objectPath} (${size} KB)`);
+    console.log(`  plan upload  ${bucket}/${webpObjectPath} (${size} KB source)`);
     return url;
   }
 
   const { error } = await supabase.storage
     .from(bucket)
-    .upload(objectPath, readFileSync(sourcePath), {
-      contentType: MIME_TYPES[extname(sourcePath).toLowerCase()] ?? 'application/octet-stream',
+    .upload(webpObjectPath, webpBuffer, {
+      contentType: 'image/webp',
       cacheControl: '31536000',
       upsert: true,
     });
 
   if (error) throw new Error(`Upload failed for ${url}: ${error.message}`);
 
-  const { data } = supabase.storage.from(bucket).getPublicUrl(objectPath);
+  const { data } = supabase.storage.from(bucket).getPublicUrl(webpObjectPath);
   return data.publicUrl;
+}
+
+async function ensureNoixorgoBucket() {
+  if (dryRun) return;
+
+  const { data: buckets, error: listError } = await supabase.storage.listBuckets();
+  if (listError) throw new Error(`Unable to inspect storage buckets: ${listError.message}`);
+  if (buckets.some((bucket) => bucket.id === 'noixorgo-images')) return;
+
+  const { error } = await supabase.storage.createBucket('noixorgo-images', {
+    public: true,
+    fileSizeLimit: '7864320',
+    allowedMimeTypes: ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/avif'],
+  });
+
+  if (error && !/already exists/i.test(error.message)) {
+    throw new Error(`Unable to create noixorgo-images bucket: ${error.message}`);
+  }
 }
 
 async function upsertRows(table, rows, onConflict) {
@@ -344,6 +361,7 @@ async function main() {
   await migrateGallery();
   await migrateAchievements();
   await migrateBlogs();
+  await ensureNoixorgoBucket();
   await migrateNoixorgo();
   printReport();
 

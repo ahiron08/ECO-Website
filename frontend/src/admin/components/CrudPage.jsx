@@ -48,6 +48,14 @@ function compareValues(left, right) {
   return String(left).localeCompare(String(right), undefined, { numeric: true, sensitivity: 'base' });
 }
 
+function describeLoadError(error, table) {
+  if (error?.code === 'PGRST205' || /schema cache|relation .* does not exist/i.test(error?.message ?? '')) {
+    return `The ${table} table is not installed in Supabase yet. Run supabase/migrations/0004_noixorgo.sql in the Supabase SQL Editor, then reload this page.`;
+  }
+
+  return error?.message ?? 'Unable to load records.';
+}
+
 export default function CrudPage({
   table,
   singular = 'record',
@@ -311,7 +319,7 @@ export default function CrudPage({
 
         {loadError && (
           <div className="flex flex-col gap-2 border-b border-red-100 bg-red-50 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-sm text-red-700">{loadError.message}</p>
+            <p className="text-sm text-red-700">{describeLoadError(loadError, table)}</p>
             <button
               type="button"
               onClick={load}
