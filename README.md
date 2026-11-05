@@ -7,7 +7,7 @@ in a responsive React application.
 
 ## Live site
 
-[Open the deployed website](https://prokriti-5-0.vercel.app/)
+[Open the deployed website](https://eco-website-rho.vercel.app/)
 
 ## Highlights
 
@@ -24,6 +24,12 @@ in a responsive React application.
 - External blog-submission flow at `/blog/submit`
 - Events and gallery pages backed by local JSON data
 - Team page with batch-based member filtering
+- Supabase-backed admin CMS at `/admin` for events, team, gallery, albums,
+  achievements, blogs and announcements
+- Secure administrator authentication with database-enforced RLS
+- Supabase Storage uploads with previews, progress and validation
+- Bundled JSON content retained as an automatic fallback while the CMS is
+  being configured
 - Merch page with a reduced-motion-aware product video
 - Lazy-loaded routes and Vite production code splitting
 - Shared navigation, footer, transitions, cards, and section components
@@ -37,6 +43,7 @@ in a responsive React application.
 - [React Router](https://reactrouter.com/)
 - [Framer Motion](https://motion.dev/)
 - [React Icons](https://react-icons.github.io/react-icons/)
+- [Supabase](https://supabase.com/) (PostgreSQL, Auth and Storage)
 - [Lucide React](https://lucide.dev/)
 - [Swiper](https://swiperjs.com/)
 - [Sharp](https://sharp.pixelplumbing.com/) for local image optimization
@@ -57,18 +64,30 @@ ECO-Website/
 │   │   ├── noixorgo/           Noixorgo cover/tip image pairs
 │   │   └── team/               Faculty and batch member photos
 │   ├── scripts/
-│   │   └── optimize-images.mjs Sharp-based image optimizer
+│   │   ├── optimize-images.mjs Sharp-based image optimizer
+│   │   ├── migrate-content.mjs JSON → Supabase migration
+│   │   ├── create-admin.mjs    Administrator provisioning
+│   │   └── verify-security.mjs Anonymous RLS/Storage checks
 │   ├── src/
+│   │   ├── admin/              Protected dashboard and CMS modules
 │   │   ├── components/         Shared UI components
-│   │   ├── data/               JSON content sources
-│   │   ├── pages/              Routed page components
-│   │   ├── App.jsx             Routes, lazy loading, scroll restoration
+│   │   ├── data/               Bundled JSON fallback content
+│   │   ├── hooks/              Public Supabase content hooks
+│   │   ├── lib/                Supabase client, mappers, storage
+│   │   ├── pages/              Routed public page components
+│   │   ├── App.jsx             Public and admin routes, lazy loading
 │   │   ├── index.css           Tailwind and shared CSS utilities
 │   │   └── main.jsx            React entry point
+│   ├── tests/                  Unit and content-integrity tests
+│   ├── .env.example            Environment variable template
 │   ├── index.html
 │   ├── package.json
 │   ├── package-lock.json
 │   └── vite.config.js
+├── docs/
+│   └── ADMIN_CMS_SETUP.md      Setup, migration, security, deployment
+├── supabase/
+│   └── migrations/             Schema, RLS and Storage SQL
 ├── .gitignore
 └── README.md
 ```
@@ -86,8 +105,21 @@ ECO-Website/
 | `/gallery` | Event and activity gallery |
 | `/team` | Team members and batch filters |
 | `/merch` | Eco Club merchandise preview |
+| `/admin/login` | Administrator sign-in |
+| `/admin` | Dashboard overview |
+| `/admin/events` | Event and poster management |
+| `/admin/team` | Team member management |
+| `/admin/gallery` | Gallery uploads (single and bulk) |
+| `/admin/albums` | Album management |
+| `/admin/achievements` | Achievement management |
+| `/admin/blogs` | Blog management |
+| `/admin/announcements` | Homepage announcements |
+| `/admin/settings` | Administrator profile and system status |
 
 Unknown routes redirect to `/`.
+
+Admin routes require an active administrator account and are protected by both
+a React route guard and database Row Level Security.
 
 ## Content and assets
 
@@ -103,6 +135,27 @@ The application keeps its content in local JSON files under
 
 Public image and media files are stored under `frontend/public/` and referenced
 with root-relative paths such as `/events/greenx.webp`.
+
+When Supabase is configured, the public pages read **published** content from
+the database and new uploads live in Supabase Storage. The JSON files are kept
+as a working fallback: if the environment variables are missing or a query
+fails, the site renders the bundled content instead of breaking.
+
+### Admin CMS
+
+Full setup, migration, security and deployment instructions are in
+[`docs/ADMIN_CMS_SETUP.md`](docs/ADMIN_CMS_SETUP.md). In short:
+
+1. Create a Supabase project and run the three SQL migrations in
+   `supabase/migrations/`.
+2. Copy `frontend/.env.example` to `frontend/.env.local` and add the project URL
+   and anon key.
+3. Provision an administrator with
+   `node scripts/create-admin.mjs --email=... --password=...`.
+4. Sign in at `/admin/login`.
+
+Administrator accounts are never created through a public form, and the
+service-role key is only used by local owner scripts.
 
 ### Adding a Noixorgo issue
 
@@ -124,6 +177,26 @@ and week printed on the images, and keep the issue metadata ordered by date.
 The page combines `featured` and `previous`, then determines the newest issue
 from the dates.
 
+### Adding an event results poster
+
+Event images and results posters belong in `frontend/public/events/`. Add the
+results poster path to the matching event in
+[`frontend/src/data/events.json`](frontend/src/data/events.json) with the
+optional `resultsImage` field:
+
+```json
+{
+  "id": 4,
+  "title": "Quiz Competition",
+  "image": "/events/quiz_competition_27october2026.webp",
+  "resultsImage": "/events/quiz_competition_results.webp"
+}
+```
+
+The event card then shows a **View Results** button that opens the poster in an
+in-page viewer, without navigating to another route. Events without a
+`resultsImage` value show no results button at all.
+
 ## Getting started
 
 ### Prerequisites
@@ -141,6 +214,7 @@ From the repository root:
 ```bash
 cd frontend
 npm install
+cp .env.example .env.local   # then fill in Supabase values (optional for the public site)
 npm run dev
 ```
 
@@ -168,6 +242,11 @@ Run these commands from `frontend/`.
 | `npm run build` | Create the production build in `frontend/dist/` |
 | `npm run preview` | Serve the production build locally |
 | `npm run lint` | Run ESLint across the frontend |
+| `npm test` | Run unit and content-integrity tests |
+| `npm run migrate:content:dry` | Preview the JSON → Supabase migration |
+| `npm run migrate:content` | Upload assets and upsert content into Supabase |
+| `npm run create:admin` | Provision an administrator (owner only) |
+| `npm run verify:security` | Check anonymous RLS and Storage access |
 | `npm run optimize:images:dry` | Preview image optimization without changing files |
 | `npm run optimize:images` | Optimize eligible images in `public/` |
 | `npm run optimize:images:content` | Force-process gallery, events, blogs, and achievements |
@@ -201,6 +280,21 @@ npm run optimize:images:content -- --dry-run
 Keep the generated image files and updated JSON references together when
 committing an optimization change.
 
+## Testing
+
+Run the automated checks from `frontend/`:
+
+```bash
+npm test
+npm run lint
+npm run build
+```
+
+The suite covers content mapping, slug/date handling, markdown parsing, form
+validation, image validation, the admin access guard, and the integrity of the
+bundled JSON and assets. Live authentication, RLS and Storage checks require a
+configured Supabase project and are run with `npm run verify:security`.
+
 ## Production build and deployment
 
 Create and inspect a production build:
@@ -208,9 +302,14 @@ Create and inspect a production build:
 ```bash
 cd frontend
 npm run lint
+npm test
 npm run build
 npm run preview
 ```
+
+Add `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` to the Vercel project for
+Production, Preview and Development. Never add the service-role key to Vercel.
+See [`docs/ADMIN_CMS_SETUP.md`](docs/ADMIN_CMS_SETUP.md) for the full checklist.
 
 The application is deployed on Vercel. Configure the deployment with:
 

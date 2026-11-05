@@ -4,6 +4,7 @@ import { AnimatePresence } from 'framer-motion';
 import Loading from './Loading';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import { AdminAuthProvider } from './admin/AdminAuthContext.jsx';
 
 // Lazy load pages for code splitting
 const HomePage = lazy(() => import('./pages/HomePage'));
@@ -15,6 +16,21 @@ const GalleryPage = lazy(() => import('./pages/GalleryPage'));
 const TeamPage = lazy(() => import('./pages/TeamPage'));
 const MerchPage = lazy(() => import('./pages/MerchPage'));
 const SubmitBlogForm = lazy(() => import('./pages/SubmitBlogForm'));
+
+// Admin routes are lazy loaded so the public bundle stays small.
+const AdminLogin = lazy(() => import('./admin/AdminLogin'));
+const AdminLayout = lazy(() => import('./admin/AdminLayout'));
+const ProtectedAdminRoute = lazy(() => import('./admin/ProtectedAdminRoute'));
+const AdminOverview = lazy(() => import('./admin/Overview'));
+const AdminEvents = lazy(() => import('./admin/EventsAdmin'));
+const AdminTeam = lazy(() => import('./admin/TeamAdmin'));
+const AdminGallery = lazy(() => import('./admin/GalleryAdmin'));
+const AdminAlbums = lazy(() => import('./admin/AlbumsAdmin'));
+const AdminAchievements = lazy(() => import('./admin/AchievementsAdmin'));
+const AdminBlogs = lazy(() => import('./admin/BlogsAdmin'));
+const AdminAnnouncements = lazy(() => import('./admin/AnnouncementsAdmin'));
+const AdminNoixorgo = lazy(() => import('./admin/NoixorgoAdmin'));
+const AdminSettings = lazy(() => import('./admin/SettingsAdmin'));
 
 /** How long the splash runs, fade included. Full length the very first time this
  *  browser loads the site, a short version on every visit after that. */
@@ -56,6 +72,8 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [splashDuration] = useState(getSplashDuration);
   const [theme, setTheme] = useState(getInitialTheme);
+  const location = useLocation();
+  const isAdminRoute = location.pathname.startsWith('/admin');
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', theme === 'dark');
@@ -81,34 +99,60 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] flex flex-col">
-      <ScrollToTop />
-      <Navbar theme={theme} onThemeChange={() => setTheme((current) => (
-        current === 'dark' ? 'light' : 'dark'
-      ))} />
-      
-      <AnimatePresence mode="wait">
-        <Suspense fallback={
-          <div className="flex items-center justify-center min-h-screen">
-            <div className="w-12 h-12 border-4 border-[#3FAE5C] border-t-transparent rounded-full animate-spin"></div>
-          </div>
-        }>
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/noixorgo" element={<NoixorgoPage />} />
-            <Route path="/events" element={<EventsPage />} />
-            <Route path="/blog" element={<BlogPage />} />
-            <Route path="/blog/:blogId" element={<BlogPostPage />} />
-            <Route path="/blog/submit" element={<SubmitBlogForm />} />
-            <Route path="/gallery" element={<GalleryPage />} />
-            <Route path="/team" element={<TeamPage />} />
-            <Route path="/merch" element={<MerchPage />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </Suspense>
-      </AnimatePresence>
-      
-      <Footer />
-    </div>
+    <AdminAuthProvider>
+      <div className="min-h-screen bg-[#FAFAFA] flex flex-col">
+        <ScrollToTop />
+        {!isAdminRoute && (
+          <Navbar theme={theme} onThemeChange={() => setTheme((current) => (
+            current === 'dark' ? 'light' : 'dark'
+          ))} />
+        )}
+
+        <AnimatePresence mode="wait">
+          <Suspense fallback={
+            <div className="flex items-center justify-center min-h-screen">
+              <div className="w-12 h-12 border-4 border-[#3FAE5C] border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          }>
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/noixorgo" element={<NoixorgoPage />} />
+              <Route path="/events" element={<EventsPage />} />
+              <Route path="/blog" element={<BlogPage />} />
+              <Route path="/blog/:blogId" element={<BlogPostPage />} />
+              <Route path="/blog/submit" element={<SubmitBlogForm />} />
+              <Route path="/gallery" element={<GalleryPage />} />
+              <Route path="/team" element={<TeamPage />} />
+              <Route path="/merch" element={<MerchPage />} />
+
+              <Route path="/admin/login" element={<AdminLogin />} />
+              <Route
+                path="/admin"
+                element={(
+                  <ProtectedAdminRoute>
+                    <AdminLayout />
+                  </ProtectedAdminRoute>
+                )}
+              >
+                <Route index element={<AdminOverview />} />
+                <Route path="events" element={<AdminEvents />} />
+                <Route path="team" element={<AdminTeam />} />
+                <Route path="gallery" element={<AdminGallery />} />
+                <Route path="albums" element={<AdminAlbums />} />
+                <Route path="achievements" element={<AdminAchievements />} />
+                <Route path="blogs" element={<AdminBlogs />} />
+                <Route path="announcements" element={<AdminAnnouncements />} />
+                <Route path="noixorgo" element={<AdminNoixorgo />} />
+                <Route path="settings" element={<AdminSettings />} />
+              </Route>
+
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </Suspense>
+        </AnimatePresence>
+
+        {!isAdminRoute && <Footer />}
+      </div>
+    </AdminAuthProvider>
   );
 }

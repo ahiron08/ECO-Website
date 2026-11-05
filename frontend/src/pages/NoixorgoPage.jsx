@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useReducedMotion } from 'framer-motion';
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import SectionTitle from '../components/SectionTitle';
-import noixorgoData from '../data/noixorgo.json';
+import { useNoixorgo } from '../hooks/useContent';
 
 const ordinalSuffix = /(\d+)(st|nd|rd|th)/;
 
@@ -57,18 +57,25 @@ function IssueImage({ issue, showingTip, active }) {
 
 export default function NoixorgoPage() {
   const prefersReducedMotion = useReducedMotion();
+  const { data: noixorgoData } = useNoixorgo();
   const stageRef = useRef(null);
   const issues = useMemo(
-    () => [noixorgoData.featured, ...(noixorgoData.previous || [])]
+    () => (noixorgoData ?? [])
       .filter((issue) => issue?.coverImage && issue?.quoteImage)
       .sort((left, right) => getIssueTime(right) - getIssueTime(left)),
-    [],
+    [noixorgoData],
   );
   const latestIndex = issues.length > 0 ? 0 : -1;
   const [activeIndex, setActiveIndex] = useState(latestIndex);
   const [showingTip, setShowingTip] = useState(false);
   const lastWheelNavigation = useRef(0);
   const currentIndex = issues.length > 0 ? getWrappedIndex(activeIndex, issues.length) : -1;
+
+  useEffect(() => {
+    if (issues.length > 0 && (activeIndex < 0 || activeIndex >= issues.length)) {
+      setActiveIndex(0);
+    }
+  }, [activeIndex, issues.length]);
 
   const selectIssue = useCallback((index) => {
     setActiveIndex(index);

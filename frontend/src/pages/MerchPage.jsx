@@ -4,7 +4,7 @@ import { FaLeaf } from 'react-icons/fa';
 
 const PREORDER_URL = ''; // Add the preorder destination here when it is ready.
 const MERCH_REVEAL_URL = 'https://www.canva.com/design/DAHZOSUX61w/Cja8NS6KNjqsC0YGeSsQGQ/view?embed';
-const MERCH_VIDEO = '/merch/merch-reveal.mp4';
+const MERCH_VIDEO = '/merch/merch.mp4';
 const MERCH_POSTER = '/merch/merch-poster.jpg';
 
 const designers = ['Krishnav', 'Gitartha', 'Atikuj'];

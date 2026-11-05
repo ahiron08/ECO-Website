@@ -198,6 +198,73 @@
     background-color: #22332A;
   }
 
+  html.dark .home-announcement {
+    background-color: #1B2A20;
+    border-color: #34443B;
+  }
+
+  html.dark .home-announcement p {
+    color: #DCE9E0;
+  }
+
+  html.dark .home-announcement p:first-child {
+    color: #A9E58A;
+  }
+
+  html.dark .home-announcement button {
+    border-color: #52675A;
+    color: #DCE9E0;
+  }
+
+  html.dark .home-announcement button:hover {
+    background-color: #22332A;
+  }
+
+  /* Admin dashboard tokens in dark mode. */
+  html.dark .admin-shell {
+    background-color: #111916;
+    color: #E6EFE9;
+  }
+
+  html.dark .admin-shell .bg-\[\#f8faf6\],
+  html.dark .admin-shell .bg-\[\#fbfdf9\],
+  html.dark .admin-shell .bg-\[\#f7f9f5\],
+  html.dark .admin-shell .bg-\[\#f1f5ee\],
+  html.dark .admin-shell .bg-\[\#eef7ea\] {
+    background-color: #1E2A24;
+  }
+
+  html.dark .admin-shell .bg-\[\#eef3ea\],
+  html.dark .admin-shell .bg-\[\#e4ebdf\],
+  html.dark .admin-shell .bg-\[\#e8eee4\] {
+    background-color: #29382F;
+  }
+
+  html.dark .admin-shell .border-\[\#e3e9e0\],
+  html.dark .admin-shell .border-\[\#eef2ec\],
+  html.dark .admin-shell .border-\[\#dce5d8\],
+  html.dark .admin-shell .border-\[\#cfdcc9\],
+  html.dark .admin-shell .border-\[\#d9e3d5\],
+  html.dark .admin-shell .border-\[\#d6e2d1\] {
+    border-color: #34443B;
+  }
+
+  html.dark .admin-shell .text-\[\#20372a\],
+  html.dark .admin-shell .text-\[\#31523a\],
+  html.dark .admin-shell .text-\[\#45634c\] {
+    color: #DCE9E0;
+  }
+
+  html.dark .admin-shell .text-\[\#2f7a3d\],
+  html.dark .admin-shell .text-\[\#718074\],
+  html.dark .admin-shell .text-\[\#7a8a7c\] {
+    color: #A9E58A;
+  }
+
+  html.dark .admin-shell .bg-\[\#f6f8f4\] {
+    background-color: #111916;
+  }
+
   html.dark .home-featured-events {
     background-color: #111916;
   }

@@ -2,17 +2,29 @@ import { useEffect } from 'react';
 import { FiArrowLeft, FiCalendar, FiUser } from 'react-icons/fi';
 import { Link, useLocation, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import blogsData from '../data/blogs.json';
+import { useBlog } from '../hooks/useContent';
+import ContentBlocks from '../components/ContentBlocks';
 
 export default function BlogPostPage() {
   const { blogId } = useParams();
   const location = useLocation();
-  const blog = blogsData.find((item) => String(item.id) === blogId);
+  const { data: blog, loading } = useBlog(blogId);
   const backPath = location.state?.from || '/blog';
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [blogId]);
+
+  if (loading && !blog) {
+    return (
+      <main className="min-h-screen bg-[#FAFAFA] pt-20">
+        <div className="flex flex-col items-center justify-center gap-4 py-32">
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-[#3FAE5C] border-t-transparent" />
+          <p className="text-muted">Loading article…</p>
+        </div>
+      </main>
+    );
+  }
 
   if (!blog) {
     return (
@@ -25,6 +37,9 @@ export default function BlogPostPage() {
             <FiArrowLeft className="w-4 h-4" />
             Back
           </Link>
+          <p className="mt-10 text-xl text-muted">
+            This article is unavailable or has not been published.
+          </p>
         </div>
       </main>
     );
@@ -47,11 +62,13 @@ export default function BlogPostPage() {
           transition={{ duration: 0.5 }}
           className="bg-white rounded-2xl overflow-hidden shadow-soft"
         >
-          <img
-            src={blog.image}
-            alt={blog.title}
-            className="w-full h-64 md:h-96 object-cover"
-          />
+          {blog.image && (
+            <img
+              src={blog.image}
+              alt={blog.title}
+              className="w-full h-64 md:h-96 object-cover"
+            />
+          )}
 
           <div className="p-8 md:p-12">
             <span className="text-sm font-medium text-[#3FAE5C]">{blog.category}</span>
@@ -70,11 +87,10 @@ export default function BlogPostPage() {
               </span>
             </div>
 
-            <div className="space-y-5 text-lg leading-8 text-muted">
-              {(blog.content || [blog.excerpt]).map((paragraph, index) => (
-                <p key={index}>{paragraph}</p>
-              ))}
-            </div>
+            <ContentBlocks
+              content={blog.content}
+              className="space-y-5 text-lg leading-8 text-muted"
+            />
           </div>
         </motion.div>
       </article>

@@ -1,3 +1,8 @@
+# Environment variables (never commit real credentials)
+.env
+.env.*
+!.env.example
+
 # Universal-agent-skills installation (cloned repo, installed skills, project brain)
 .agent-skills-brain/
 .agent-brain/
