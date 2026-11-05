@@ -85,6 +85,17 @@ export default function App() {
     }
   }, [theme]);
 
+  useEffect(() => {
+    const handleThemeChange = (event) => {
+      if (event.detail === 'dark' || event.detail === 'light') {
+        setTheme(event.detail);
+      }
+    };
+
+    window.addEventListener('eco-theme-change', handleThemeChange);
+    return () => window.removeEventListener('eco-theme-change', handleThemeChange);
+  }, []);
+
   const handleLoadingComplete = () => {
     try {
       localStorage.setItem(SPLASH_SEEN_KEY, '1');

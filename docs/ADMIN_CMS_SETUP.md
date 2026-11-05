@@ -90,11 +90,12 @@ The migrations live in `supabase/migrations/` and must run **in order**:
 1. `0001_schema.sql` — tables, indexes, triggers, constraints
 2. `0002_rls.sql` — `is_admin()`, table policies, column grants
 3. `0003_storage.sql` — buckets and storage policies
+4. `0004_noixorgo.sql` — Noixorgo issues table and policies
 
 ### Option A — Supabase SQL editor (simplest)
 
 For each file, open **SQL Editor → New query**, paste the whole file and run it.
-Run `0001`, then `0002`, then `0003`.
+Run `0001`, then `0002`, then `0003`, then `0004`.
 
 ### Option B — Supabase CLI
 
@@ -319,7 +320,7 @@ the owner's approval.
 1. Review the diff and make a branch/PR.
 2. Confirm `frontend/.env.example` contains placeholders only and no `.env`
    file is tracked (`git status --ignored`).
-3. Create/confirm the production Supabase project and run the three migrations.
+3. Create/confirm the production Supabase project and run all four migrations.
 4. Provision the production administrator with `scripts/create-admin.mjs`
    using production credentials from a local env file.
 5. Back up production data (Supabase **Database → Backups**) and the JSON

@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { FiImage, FiUploadCloud, FiX } from 'react-icons/fi';
 import {
-  BUCKET_MAX_BYTES,
   IMAGE_ACCEPT,
+  SOURCE_MAX_BYTES,
   deleteStoredImage,
   formatBytes,
   uploadImage,
@@ -14,8 +14,6 @@ import { useToast } from '../useToast';
 import Modal from './Modal';
 
 const GALLERY_BUCKET = 'gallery-images';
-const maxBytes = BUCKET_MAX_BYTES[GALLERY_BUCKET];
-
 export default function BulkUploadDialog({ open, onClose, onUploaded, albums = [], events = [] }) {
   const { notify } = useToast();
   const inputRef = useRef(null);
@@ -47,7 +45,7 @@ export default function BulkUploadDialog({ open, onClose, onUploaded, albums = [
 
     const accepted = [];
     selected.forEach((file) => {
-      const validation = validateImageFile(file, maxBytes);
+      const validation = validateImageFile(file, SOURCE_MAX_BYTES);
       if (!validation.valid) {
         notify(`${file.name}: ${validation.error}`, 'error');
         return;
@@ -191,7 +189,7 @@ export default function BulkUploadDialog({ open, onClose, onUploaded, albums = [
           <FiUploadCloud className="h-7 w-7 text-[#3FAE5C]" aria-hidden="true" />
           <span className="text-sm font-semibold text-[#31523a]">Choose images from your device</span>
           <span className="text-xs text-muted">
-            JPG, PNG, WebP, GIF or AVIF · up to {formatBytes(maxBytes)} each
+            JPG, PNG, WebP, GIF or AVIF · up to {formatBytes(SOURCE_MAX_BYTES)} each before compression
           </span>
         </button>
 

@@ -40,7 +40,7 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className="flex min-h-screen items-stretch bg-[#FAFAFA]">
+    <div className="admin-login flex min-h-screen items-stretch bg-[#FAFAFA]">
       <aside className="relative hidden w-1/2 overflow-hidden bg-[#10291d] px-12 py-14 text-white lg:flex lg:flex-col lg:justify-between">
         <div className="absolute inset-0 opacity-25" aria-hidden="true">
           <div className="absolute -right-24 top-16 h-96 w-96 rounded-full bg-[#3FAE5C] blur-3xl" />
