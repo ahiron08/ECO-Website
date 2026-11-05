@@ -9,6 +9,7 @@ loadEnvFiles();
 const { flags } = parseArgs();
 const dryRun = flags.has('--dry-run');
 const skipImages = flags.has('--skip-images');
+const updateExisting = flags.has('--update-existing');
 const help = flags.has('--help');
 
 const dataDir = join(frontendRoot, 'src', 'data');
@@ -32,6 +33,8 @@ ECO Club content migration
   node scripts/migrate-content.mjs --dry-run     preview the plan (no credentials needed)
   node scripts/migrate-content.mjs               upload assets and upsert records
   node scripts/migrate-content.mjs --skip-images keep bundled image paths
+  node scripts/migrate-content.mjs --update-existing
+                                                explicitly update existing legacy records
 
 Requires SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in frontend/.env.local.
 The JSON files are read only and are never deleted.
@@ -41,6 +44,7 @@ The JSON files are read only and are never deleted.
 
 let supabase = null;
 let supabaseUrl = '';
+const report = new Map();
 
 async function uploadAsset(bucket, url, label) {
   if (!url || typeof url !== 'string') return null;
@@ -78,22 +82,44 @@ async function uploadAsset(bucket, url, label) {
 }
 
 async function upsertRows(table, rows, onConflict) {
-  if (rows.length === 0) return [];
+  const counts = { inserted: 0, updated: 0, skipped: 0, failed: 0 };
+  report.set(table, counts);
+  const saved = [];
 
-  if (dryRun) {
-    console.log(`  plan upsert  ${table}: ${rows.length} record(s) on ${onConflict}`);
-    return [];
+  for (const row of rows) {
+    if (dryRun) {
+      counts.inserted += 1;
+      continue;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from(table)
+        .upsert([row], {
+          onConflict,
+          ignoreDuplicates: !updateExisting,
+        })
+        .select();
+
+      if (error) throw error;
+      if (data?.length) {
+        if (updateExisting) counts.updated += 1;
+        else counts.inserted += 1;
+        saved.push(data[0]);
+      } else {
+        counts.skipped += 1;
+      }
+    } catch (error) {
+      counts.failed += 1;
+      console.error(`  failed       ${table} ${row[onConflict]}: ${error.message}`);
+    }
   }
 
-  const { data, error } = await supabase
-    .from(table)
-    .upsert(rows, { onConflict })
-    .select();
-
-  if (error) throw new Error(`${table}: ${error.message}`);
-
-  console.log(`  upserted     ${table}: ${data.length} record(s)`);
-  return data;
+  console.log(
+    `  ${table}: ${counts.inserted} inserted, ${counts.updated} updated, `
+    + `${counts.skipped} skipped, ${counts.failed} failed`,
+  );
+  return saved;
 }
 
 async function migrateEvents() {
@@ -245,6 +271,54 @@ async function migrateBlogs() {
   await upsertRows('blogs', rows, 'legacy_id');
 }
 
+function parseLegacyDate(value) {
+  if (!value) return null;
+  const parsed = new Date(String(value).replace(/(\d+)(st|nd|rd|th)/, '$1'));
+  return Number.isNaN(parsed.getTime()) ? null : parsed.toISOString().slice(0, 10);
+}
+
+async function migrateNoixorgo() {
+  const data = readJson('noixorgo.json');
+  const issues = [data.featured, ...(data.previous ?? [])].filter(Boolean);
+  const rows = [];
+
+  for (const issue of issues) {
+    const coverImage = await uploadAsset(
+      'noixorgo-images',
+      issue.coverImage,
+      `Noixorgo week ${issue.week} cover`,
+    );
+    const quoteImage = await uploadAsset(
+      'noixorgo-images',
+      issue.quoteImage,
+      `Noixorgo week ${issue.week} tip`,
+    );
+
+    rows.push({
+      week: issue.week,
+      legacy_week: issue.week,
+      issue_date: parseLegacyDate(issue.date),
+      date_label: issue.date ?? null,
+      cover_image_url: coverImage,
+      quote_image_url: quoteImage,
+      featured: issue === data.featured,
+      status: 'published',
+    });
+  }
+
+  await upsertRows('noixorgo_issues', rows, 'legacy_week');
+}
+
+function printReport() {
+  console.log('\nMigration summary');
+  for (const [table, counts] of report) {
+    console.log(
+      `  ${table}: ${counts.inserted} inserted, ${counts.updated} updated, `
+      + `${counts.skipped} skipped, ${counts.failed} failed`,
+    );
+  }
+}
+
 async function main() {
   console.log(dryRun ? '\nECO Club content migration — DRY RUN\n' : '\nECO Club content migration\n');
 
@@ -270,6 +344,8 @@ async function main() {
   await migrateGallery();
   await migrateAchievements();
   await migrateBlogs();
+  await migrateNoixorgo();
+  printReport();
 
   if (dryRun) {
     console.log('\nDry run complete. No records or files were changed.');

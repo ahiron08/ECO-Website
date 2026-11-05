@@ -8,6 +8,7 @@ import teamData from '../data/team.json';
 import galleryData from '../data/gallery.json';
 import achievementsData from '../data/achievements.json';
 import blogsData from '../data/blogs.json';
+import noixorgoData from '../data/noixorgo.json';
 import { slugify } from './contentMapper';
 
 export const fallbackEvents = eventsData.map((event) => ({
@@ -35,3 +36,8 @@ export const fallbackBlogs = blogsData.map((blog) => ({
 export const fallbackAnnouncements = [];
 
 export const fallbackAlbums = [];
+
+export const fallbackNoixorgo = [
+  noixorgoData.featured,
+  ...(noixorgoData.previous ?? []),
+];

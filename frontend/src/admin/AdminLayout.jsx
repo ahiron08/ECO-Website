@@ -27,6 +27,7 @@ const navigation = [
   { to: '/admin/achievements', label: 'Achievements', icon: FiAward },
   { to: '/admin/blogs', label: 'Blogs', icon: FiFileText },
   { to: '/admin/announcements', label: 'Announcements', icon: FiBell },
+  { to: '/admin/noixorgo', label: 'Noixorgo', icon: FiImage },
   { to: '/admin/settings', label: 'Settings', icon: FiSettings },
 ];
 
@@ -39,6 +40,7 @@ const titles = {
   '/admin/achievements': { title: 'Achievements', subtitle: 'Showcase awards and milestones.' },
   '/admin/blogs': { title: 'Blogs', subtitle: 'Write and publish articles for the blog.' },
   '/admin/announcements': { title: 'Announcements', subtitle: 'Share short notices with visitors.' },
+  '/admin/noixorgo': { title: 'Noixorgo', subtitle: 'Manage magazine issues and environmental tips.' },
   '/admin/settings': { title: 'Settings', subtitle: 'Your account and system status.' },
 };
 

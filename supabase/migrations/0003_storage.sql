@@ -10,7 +10,8 @@ values
   ('gallery-images', 'gallery-images', true, 7864320, array['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/avif']),
   ('achievement-images', 'achievement-images', true, 5242880, array['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/avif']),
   ('blog-images', 'blog-images', true, 5242880, array['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/avif']),
-  ('announcement-images', 'announcement-images', true, 5242880, array['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/avif'])
+  ('announcement-images', 'announcement-images', true, 5242880, array['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/avif']),
+  ('noixorgo-images', 'noixorgo-images', true, 7864320, array['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/avif'])
 on conflict (id) do update
   set public = excluded.public,
       file_size_limit = excluded.file_size_limit,
@@ -28,7 +29,8 @@ using (
     'gallery-images',
     'achievement-images',
     'blog-images',
-    'announcement-images'
+    'announcement-images',
+    'noixorgo-images'
   )
 );
 
@@ -44,7 +46,8 @@ with check (
     'gallery-images',
     'achievement-images',
     'blog-images',
-    'announcement-images'
+    'announcement-images',
+    'noixorgo-images'
   )
   and public.is_admin()
 );
@@ -61,7 +64,8 @@ using (
     'gallery-images',
     'achievement-images',
     'blog-images',
-    'announcement-images'
+    'announcement-images',
+    'noixorgo-images'
   )
   and public.is_admin()
 )
@@ -72,7 +76,8 @@ with check (
     'gallery-images',
     'achievement-images',
     'blog-images',
-    'announcement-images'
+    'announcement-images',
+    'noixorgo-images'
   )
   and public.is_admin()
 );

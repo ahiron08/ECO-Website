@@ -34,4 +34,5 @@ export const STORAGE_BUCKETS = {
   achievements: 'achievement-images',
   blogs: 'blog-images',
   announcements: 'announcement-images',
+  noixorgo: 'noixorgo-images',
 };

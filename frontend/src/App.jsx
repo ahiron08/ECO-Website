@@ -4,7 +4,7 @@ import { AnimatePresence } from 'framer-motion';
 import Loading from './Loading';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
-import { AdminAuthProvider } from './admin/AdminAuthContext';
+import { AdminAuthProvider } from './admin/AdminAuthContext.jsx';
 
 // Lazy load pages for code splitting
 const HomePage = lazy(() => import('./pages/HomePage'));
@@ -29,6 +29,7 @@ const AdminAlbums = lazy(() => import('./admin/AlbumsAdmin'));
 const AdminAchievements = lazy(() => import('./admin/AchievementsAdmin'));
 const AdminBlogs = lazy(() => import('./admin/BlogsAdmin'));
 const AdminAnnouncements = lazy(() => import('./admin/AnnouncementsAdmin'));
+const AdminNoixorgo = lazy(() => import('./admin/NoixorgoAdmin'));
 const AdminSettings = lazy(() => import('./admin/SettingsAdmin'));
 
 /** How long the splash runs, fade included. Full length the very first time this
@@ -141,6 +142,7 @@ export default function App() {
                 <Route path="achievements" element={<AdminAchievements />} />
                 <Route path="blogs" element={<AdminBlogs />} />
                 <Route path="announcements" element={<AdminAnnouncements />} />
+                <Route path="noixorgo" element={<AdminNoixorgo />} />
                 <Route path="settings" element={<AdminSettings />} />
               </Route>
 

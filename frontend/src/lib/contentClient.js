@@ -126,3 +126,17 @@ export async function fetchAnnouncements() {
       && (!announcement.expiryDate || announcement.expiryDate >= today)
     ));
 }
+
+export async function fetchNoixorgoIssues() {
+  const rows = await selectPublished('noixorgo_issues', [
+    ['issue_date', { ascending: false, nullsFirst: false }],
+    ['week', { ascending: false }],
+  ]);
+
+  return rows.map((row) => ({
+    week: row.week,
+    date: row.date_label || row.issue_date || '',
+    coverImage: row.cover_image_url,
+    quoteImage: row.quote_image_url,
+  }));
+}

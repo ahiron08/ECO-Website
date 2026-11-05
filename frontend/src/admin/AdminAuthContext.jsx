@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { isSupabaseConfigured, supabase } from '../lib/supabase';
-import { AdminAuthContext } from './adminAuthContext';
+import { AdminAuthContext } from './adminAuthContext.js';
 
 export function AdminAuthProvider({ children }) {
   const [session, setSession] = useState(null);
@@ -111,4 +111,3 @@ export function AdminAuthProvider({ children }) {
     </AdminAuthContext.Provider>
   );
 }
-

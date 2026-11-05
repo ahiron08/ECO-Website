@@ -8,6 +8,7 @@ import {
   fetchBlogs,
   fetchEvents,
   fetchGalleryItems,
+  fetchNoixorgoIssues,
   fetchTeamMembers,
 } from '../lib/contentClient';
 import {
@@ -17,6 +18,7 @@ import {
   fallbackBlogs,
   fallbackEvents,
   fallbackGallery,
+  fallbackNoixorgo,
   fallbackTeam,
 } from '../lib/fallbackContent';
 
@@ -140,6 +142,10 @@ export function useBlogs() {
 
 export function useAnnouncements() {
   return useContentQuery('announcements', fetchAnnouncements, fallbackAnnouncements);
+}
+
+export function useNoixorgo() {
+  return useContentQuery('noixorgo', fetchNoixorgoIssues, fallbackNoixorgo);
 }
 
 export function useBlog(identifier) {
