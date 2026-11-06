@@ -14,7 +14,7 @@ export default function Footer() {
           {/* Logo & About */}
           <div className="md:col-span-2">
             <Link to="/" className="flex items-center space-x-3 mb-6">
-              <img src="/logo.png" alt="Eco Club Logo" className="w-12 h-12" />
+              <img src="/10_year_logo.png" alt="Eco Club Logo" className="w-12 h-12" />
               <span className="text-2xl font-bold">Eco Club NITS</span>
             </Link>
             <p className="text-gray-300 mb-6 max-w-md">
@@ -38,7 +38,7 @@ export default function Footer() {
           <div>
             <h3 className="text-xl font-bold mb-6">Quick Links</h3>
             <ul className="space-y-3">
-              {['Home', 'Noixorgo', 'Events', 'Blog', 'Gallery', 'Team'].map((item) => (
+              {['Home', 'Noixorgo', 'Events', 'Blog', 'Gallery', 'Team', 'Merch'].map((item) => (
                 <li key={item}>
                   <Link
                     to={item === 'Home' ? '/' : `/${item.toLowerCase()}`}

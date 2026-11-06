@@ -4,32 +4,61 @@
     "title": "Prokriti 6.0-World Environment Day Celebration",
     "organizer": "Eco Club NITS",
     "date": "3 June-9 June 2026",
+    "startDate": "2026-06-03",
+    "endDate": "2026-06-09",
     "time": "10:00 AM - 05:00 PM",
     "location": "Online",
     "description": "Join us for a week-long celebration of World Environment Day with guest speakers, tree plantation, and eco-friendly workshops.",
-    "status": "upcoming",
-    "image": "/gallery/Prokriti.jpeg"
+    "image": "/events/Prokriti.webp"
   },
   {
     "id": 2,
     "title": "Greenx Hackathon 2025",
     "organizer": "Eco Club NITS",
     "date": "June 9, 2026",
+    "startDate": "2026-06-09",
+    "endDate": "2026-06-09",
     "time": "08:00 AM - 08:00 PM",
     "location": "Online",
     "description": "A hackathon focused on solving environmental challenges using technology and innovation.",
-    "status": "past",
-    "image": "/gallery/greenx.jpeg"
+    "image": "/events/greenx.webp"
   },
   {
-    "id": 6,
+    "id": 3,
     "title": "Planet Quiz",
     "organizer": "Eco Club NITS",
     "date": "April 19, 2026",
+    "startDate": "2026-04-19",
+    "endDate": "2026-04-19",
     "time": "7:00 PM",
     "location": "New Gallery",
     "description": "Test your knowledge about our planet Earth in our annual quiz competition.",
-    "status": "past",
-    "image": "/gallery/quiz.jpeg"
+    "image": "/events/quiz.webp"
+  },
+  {
+    "id": 4,
+    "title": "Quiz Competition",
+    "organizer": "Eco Club NITS",
+    "date": "27 October, 2026",
+    "startDate": "2026-10-27",
+    "endDate": "2026-10-27",
+    "time": "6:00 PM",
+    "location": "New Gallery (G301)",
+    "description": "Test your knowledge in our annual quiz competition.",
+    "image": "/events/quiz_competition_27october2026.webp"
+  },
+  {
+    "id": 5,
+    "title": "Waste To Product",
+    "organizer": "Eco Club NITS",
+    "date": "29 October, 2026 - 31 October, 2026",
+    "startDate": "2026-10-29",
+    "endDate": "2026-10-31",
+    "time": "10:00 AM",
+    "location": "",
+    "description": "Turn waste into wealth and let your creativity make a difference.",
+    "image": "/events/waste_to_product.webp",
+    "resultsImage": "/winners/image.png",
+    "link": "https://docs.google.com/forms/d/e/1FAIpQLSet9T23pXQyRKfTr4_wI_meMEAjxfgit7VYYEazToLJGC8HPw/viewform?usp=publish-editor"
   }
 ]

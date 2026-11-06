@@ -4,8 +4,69 @@
     "title": "Sustainable Development: The Path Forward",
     "excerpt": "Exploring the intersection of technology and environmental sustainability in modern times. How can we build a greener future?",
     "date": "May 15, 2025",
-    "image": "https://images.unsplash.com/photo-1466611653911-95081537e5b7?w=600&h=400&fit=crop",
-    "author": "Eco Club Team",
-    "category": "Sustainability"
+    "image": "/blogs/featured.webp",
+    "author": "Eco Club",
+    "category": "Technology",
+    "content": [
+      "Sustainable development is about creating a future where people and the planet can thrive together. It brings environmental responsibility, social wellbeing, and economic progress into the same conversation.",
+      "Technology can help us move towards that future when it is designed with care. From renewable energy and efficient infrastructure to better ways of measuring our impact, thoughtful innovation gives communities practical tools for making sustainable choices.",
+      "The path forward also depends on everyday action. By learning, sharing ideas, and working together, we can support solutions that protect natural resources and make a greener future possible for everyone."
+    ]
+  },
+  {
+    "id": 2,
+    "title": "Towards a Greener Tomorrow",
+    "excerpt": "Exploring sustainable living and waste management to protect nature and build a greener future.",
+    "date": "Sep 29, 2026",
+    "image": "/blogs/towards_a_greener_future.webp",
+    "author": "Violina Sarma",
+    "category": "Waste Management",
+    "content": [
+      "Nature provides us with the resources essential for life, yet its preservation often depends on the choices we make every day. Environmental awareness and sustainable practices are vital to ensuring a healthier planet for future generations. As the world faces growing challenges such as climate change, pollution, deforestation, and biodiversity loss, the need to protect our natural environment has become more important than ever.",
+      "Through its initiatives, Eco Club, NIT Silchar, encourages individuals to adopt eco-friendly habits, protect biodiversity, and contribute towards a sustainable society. By promoting environmental awareness and responsible living, the club strives to inspire students and the wider community to recognise their role in conserving nature.",
+      "Small actions, such as reducing plastic waste, conserving water and electricity, planting trees, and making mindful choices, can collectively create a significant impact. By embracing these practices in our daily lives, we can contribute to preserving natural resources and maintaining ecological balance."
+    ]
+  },
+  {
+    "id": 3,
+    "title": "A Greener Milestone",
+    "excerpt": "Exploring campus sustainability and global achievements through smart resource management and green initiatives.",
+    "date": "Oct 15, 2026",
+    "image": "/blogs/Future_Forward.webp",
+    "author": "Supriya",
+    "category": "Sustainability",
+    "content": [
+      "A sustainable campus is built on continuous improvement. It requires transitioning from standard benchmarks to measurable global achievements by refining energy frameworks, reducing carbon footprints, and tracking ecological growth.",
+      "At NIT Silchar, we move toward that standard by transforming engineering into actionable impact. By climbing 25 spots to rank 166th globally in the UI GreenMetric World University Rankings, the institute has demonstrated how data-driven sustainability models optimize campus planning.",
+      "The path forward depends on sustained collective action. Through innovative energy management, smart resource allocation, and collaborative campus policies, we turn environmental metrics into a real-world blueprint for a smarter, greener tomorrow."
+    ]
+  },
+  {
+    "id": 4,
+    "title": "Earth Beyond Ambitions",
+    "excerpt": "Progress is often measured by what we build, discover, and achieve. Yet the world we hope to improve depends on something far more fundamental.",
+    "date": "Oct 27, 2026",
+    "image": "/blogs/earth_beyond.webp",
+    "author": "Sashanka",
+    "category": "Conservation",
+    "content": [
+      "At the National Institute of Technology Silchar, Eco Club represents the importance of bringing environmental consciousness into everyday student life. It encourages us to look beyond classrooms and laboratories and recognise our responsibility towards the natural world that sustains us.",
+      "Environmental protection does not always begin with extraordinary efforts. Sometimes, it starts with avoiding unnecessary waste, using resources mindfully, protecting green spaces, or simply becoming more conscious of our surroundings. These small actions, when adopted collectively, can create meaningful change.",
+      "A student community provides the perfect space for such ideas to grow. By encouraging participation, discussion, and practical initiatives, Eco Club can help transform environmental awareness from a passing thought into a lasting habit.",
+      "Assam's rivers, forests, wetlands, and diverse wildlife remind us of the natural wealth we inherit. Preserving this heritage requires more than appreciation; it demands responsibility and consistent effort. Eco Club, NIT Silchar, reflects the idea that education should prepare us not only to shape the future, but also to protect it. After all, a greener tomorrow begins with the choices we make today."
+    ]
+  },
+  {
+    "id": 5,
+    "title": "Save Water, Save Life",
+    "excerpt": "Small daily habits can protect Earth's limited fresh water.",
+    "date": "Jan 30, 2025",
+    "image": "/blogs/save_water.webp",
+    "author": "Atikuj Zaman",
+    "category": "Water",
+    "content": [
+      "Water feels endless when it flows from our taps, but only about 1% of Earth's water is fresh and easily accessible. Millions of people around the world still struggle to find clean drinking water every day. Protecting this limited resource is one of the most important responsibilities we share.",
+      "Small habits at home can make a surprising difference. Fixing leaky taps, turning off the water while brushing, and taking shorter showers can save thousands of liters each year. Reusing water for plants and harvesting rainwater are simple ways to stretch every drop further. Conservation also depends on communities and governments working together. Protecting rivers, wetlands, and groundwater keeps our supply healthy for the long term. When each of us treats water as a shared resource, we secure a better future for everyone."
+    ]
   }
 ]

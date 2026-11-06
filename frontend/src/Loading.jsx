@@ -5,6 +5,7 @@ export default function Loading({ onLoadingComplete }) {
   const [fadeOut, setFadeOut] = useState(false);
 
   useEffect(() => {
+    
     const timer = setTimeout(() => {
       setFadeOut(true);
       // Wait for fade-out animation to complete before calling onLoadingComplete
@@ -67,7 +68,7 @@ export default function Loading({ onLoadingComplete }) {
             </div>
             
             <img 
-              src="/logo.png" 
+              src="/10_year_logo.png" 
               alt="NITS Eco Club Logo" 
               loading="eager"
               className="w-24 h-24 logo-bounce z-10 relative drop-shadow-lg"

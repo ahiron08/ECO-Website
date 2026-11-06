@@ -1,14 +1,50 @@
 [
   {
     "id": 1,
-    "src": "/gallery/Plantation.jpeg",
-    "alt": "Tree plantation activity",
-    "category": "Plantation"
+    "src": "/gallery/kati_bihu.webp",
+    "alt": "Kati Bihu",
+    "category": "Celebrations"
   },
   {
     "id": 2,
-    "src": "/gallery/Expert.jpeg",
+    "src": "/gallery/Plantation.webp",
+    "alt": "Tree plantation activity",
+    "category": "Green Care"
+  },
+  {
+    "id": 3,
+    "src": "/gallery/Expert.webp",
     "alt": "Expert Talk Session",
-    "category": "Workshops"
+    "category": "Discussions"
+  },
+  {
+    "id": 4,
+    "src": "/gallery/earth_day.webp",
+    "alt": " International Mother Earth Day",
+    "category": "Competitions"
+  },
+  {
+    "id": 5,
+    "src": "/gallery/Earth_day_price.webp",
+    "alt": "Under World Earth Day",
+    "category": "Competitions"
+  },
+  {
+    "id": 6,
+    "src": "/gallery/farewell.webp",
+    "alt": "Farewell Batch'26",
+    "category": "Celebrations"
+  },
+  {
+    "id": 7,
+    "src": "/gallery/quiz2026.webp",
+    "alt": "Quiz Competition",
+    "category": "Competitions"
+  },
+  {
+    "id": 8,
+    "src": "/achievements/166_green_metric.webp",
+    "alt": "NIT Silchar ranked 166th in UI Green Metric 2025",
+    "category": "Achievements"
   }
 ]

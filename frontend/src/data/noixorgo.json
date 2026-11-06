@@ -1,18 +1,58 @@
 {
   "featured": {
-    "title": "Noixorgo- July 2026",
-    "description": "A weekly feed on nature.",
-    "image": "/gallery/noixorgo.jpeg",
-    "date": "12 July, 2026"
+    "week": 208,
+    "date": "12th July, 2026",
+    "coverImage": "/noixorgo/1.webp",
+    "quoteImage": "/noixorgo/2.webp"
   },
-  "articles": [
+  "previous": [
     {
-      "id": 1,
-      "title": "Green Campus Initiative: A Year in Review",
-      "excerpt": "Looking back at our achievements in making NIT Silchar a more sustainable campus.",
-      "date": "May 25, 2026",
-      "category": "Sustainability",
-      "image": "https://images.unsplash.com/photo-1466611653911-95081537e5b7?w=600&h=400&fit=crop"
-    }],
-  "categories": ["All", "Sustainability", "Technology", "Conservation", "Waste Management", "Water", "Student Stories"]
+      "week": 207,
+      "date": "15th March, 2026",
+      "coverImage": "/noixorgo/3.webp",
+      "quoteImage": "/noixorgo/4.webp"
+    },
+    {
+      "week": 206,
+      "date": "30th August, 2025",
+      "coverImage": "/noixorgo/5.webp",
+      "quoteImage": "/noixorgo/6.webp"
+    },
+    {
+      "week": 205,
+      "date": "13th July, 2025",
+      "coverImage": "/noixorgo/7.webp",
+      "quoteImage": "/noixorgo/8.webp"
+    },
+    {
+      "week": 201,
+      "date": "8th June, 2025",
+      "coverImage": "/noixorgo/9.webp",
+      "quoteImage": "/noixorgo/10.webp"
+    },
+    {
+      "week": 199,
+      "date": "18th May, 2025",
+      "coverImage": "/noixorgo/11.webp",
+      "quoteImage": "/noixorgo/12.webp"
+    },
+    {
+      "week": 198,
+      "date": "27th April, 2025",
+      "coverImage": "/noixorgo/13.webp",
+      "quoteImage": "/noixorgo/14.webp"
+    },
+    {
+      "week": 196,
+      "date": "13th April, 2025",
+      "coverImage": "/noixorgo/15.webp",
+      "quoteImage": "/noixorgo/16.webp"
+    },
+    {
+      "week": 195,
+      "date": "6th April, 2025",
+      "coverImage": "/noixorgo/17.webp",
+      "quoteImage": "/noixorgo/18.webp"
+    }
+  ]
 }

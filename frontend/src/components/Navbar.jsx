@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiSearch, FiMenu, FiX } from 'react-icons/fi';
+import { FiSearch, FiMenu, FiX, FiMoon, FiSun } from 'react-icons/fi';
 
-export default function Navbar() {
+export default function Navbar({ theme, onThemeChange }) {
   const [scrolled, setScrolled] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -18,7 +18,8 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Determine text color: on non-home pages, always use dark text; on home page, use white when not scrolled
+  // Keep the transparent home navbar readable over the hero; dark mode uses
+  // the same light text treatment until the navbar gets a solid background.
   const useDarkText = !isHomePage || scrolled;
 
   const navLinks = [
@@ -28,6 +29,7 @@ export default function Navbar() {
     { name: 'Blog', path: '/blog' },
     { name: 'Gallery', path: '/gallery' },
     { name: 'Team', path: '/team' },
+    { name: 'Merch', path: '/merch' },
   ];
 
   return (
@@ -36,7 +38,7 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-3">
-            <img src="/logo.png" alt="Eco Club Logo" className="w-12 h-12" />
+            <img src="/10_year_logo.png" alt="Eco Club Logo" className="w-12 h-12" />
             <span className={`text-2xl font-bold transition-colors ${useDarkText ? 'text-[#222]' : 'text-white'}`}>
               Eco Club NITS
             </span>
@@ -80,6 +82,20 @@ export default function Navbar() {
               aria-label="Search"
             >
               <FiSearch className="w-6 h-6" />
+            </button>
+
+            <button
+              type="button"
+              onClick={onThemeChange}
+              className={`rounded-lg p-2 transition-colors ${
+                useDarkText
+                  ? 'text-[#222] hover:text-[#3FAE5C]'
+                  : 'text-white hover:text-[#C7F65B]'
+              }`}
+              aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+              title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+            >
+              {theme === 'dark' ? <FiSun className="h-6 w-6" /> : <FiMoon className="h-6 w-6" />}
             </button>
 
             {/* Mobile Menu Button */}

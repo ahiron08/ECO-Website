@@ -1,144 +1,241 @@
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { FiSearch } from 'react-icons/fi';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useReducedMotion } from 'framer-motion';
+import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import SectionTitle from '../components/SectionTitle';
-import noixorgoData from '../data/noixorgo.json';
+import { useNoixorgo } from '../hooks/useContent';
 
-const categories = ['All', 'Sustainability', 'Technology', 'Conservation', 'Waste Management', 'Water', 'Student Stories'];
+const ordinalSuffix = /(\d+)(st|nd|rd|th)/;
+
+function getIssueTime(issue) {
+  if (!issue.date) return Number.NEGATIVE_INFINITY;
+
+  const normalizedDate = issue.date.replace(ordinalSuffix, '$1');
+  const timestamp = Date.parse(normalizedDate);
+  return Number.isNaN(timestamp) ? Number.NEGATIVE_INFINITY : timestamp;
+}
+
+function getWrappedIndex(index, length) {
+  return (index + length) % length;
+}
+
+function getRelativePosition(index, activeIndex, length) {
+  const forwardDistance = getWrappedIndex(index - activeIndex, length);
+  const backwardDistance = forwardDistance - length;
+
+  if (forwardDistance === 0) return 'active';
+  if (backwardDistance === -1) return 'previous';
+  if (forwardDistance === 1) return 'next';
+  if (forwardDistance === 2) return 'far';
+  return 'hidden';
+}
+
+function IssueImage({ issue, showingTip, active }) {
+  const transitionClass = active ? 'noixorgo-image-transition' : '';
+  return (
+    <div className="relative aspect-square w-full overflow-hidden bg-black">
+      <img
+        src={issue.coverImage}
+        alt={`Noixorgo Week ${issue.week} cover`}
+        className={`absolute inset-0 h-full w-full object-contain ${transitionClass} ${
+          showingTip ? 'opacity-0' : 'opacity-100'
+        }`}
+        loading={active ? 'eager' : 'lazy'}
+        decoding="async"
+      />
+      <img
+        src={issue.quoteImage}
+        alt={`Noixorgo Week ${issue.week} environmental tip`}
+        className={`absolute inset-0 h-full w-full object-contain ${transitionClass} ${
+          showingTip ? 'opacity-100' : 'opacity-0'
+        }`}
+        loading="lazy"
+        decoding="async"
+      />
+    </div>
+  );
+}
 
 export default function NoixorgoPage() {
-  const [activeCategory, setActiveCategory] = useState('All');
-  const [searchQuery, setSearchQuery] = useState('');
+  const prefersReducedMotion = useReducedMotion();
+  const { data: noixorgoData } = useNoixorgo();
+  const stageRef = useRef(null);
+  const issues = useMemo(
+    () => (noixorgoData ?? [])
+      .filter((issue) => issue?.coverImage && issue?.quoteImage)
+      .sort((left, right) => getIssueTime(right) - getIssueTime(left)),
+    [noixorgoData],
+  );
+  const latestIndex = issues.length > 0 ? 0 : -1;
+  const [activeIndex, setActiveIndex] = useState(latestIndex);
+  const [showingTip, setShowingTip] = useState(false);
+  const lastWheelNavigation = useRef(0);
+  const currentIndex = issues.length > 0 ? getWrappedIndex(activeIndex, issues.length) : -1;
 
-  const filteredArticles = noixorgoData.articles.filter(article => {
-    const matchesCategory = activeCategory === 'All' || article.category === activeCategory;
-    const matchesSearch = article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         article.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesCategory && matchesSearch;
-  });
+  useEffect(() => {
+    if (issues.length > 0 && (activeIndex < 0 || activeIndex >= issues.length)) {
+      setActiveIndex(0);
+    }
+  }, [activeIndex, issues.length]);
+
+  const selectIssue = useCallback((index) => {
+    setActiveIndex(index);
+    setShowingTip(false);
+  }, []);
+
+  const moveIssue = useCallback((direction) => {
+    if (issues.length === 0) return;
+    selectIssue(getWrappedIndex(currentIndex + direction, issues.length));
+  }, [currentIndex, issues.length, selectIssue]);
+
+  const activeIssue = issues[currentIndex];
+
+  const toggleTip = () => setShowingTip((visible) => !visible);
+
+  const handleActiveCardKeyDown = (event) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      toggleTip();
+    }
+  };
+
+  useEffect(() => {
+    const stage = stageRef.current;
+    if (!stage) return undefined;
+
+    const handleCarouselWheel = (event) => {
+      if (issues.length < 2 || Math.abs(event.deltaY) < Math.abs(event.deltaX)) return;
+
+      event.preventDefault();
+      const now = Date.now();
+      if (now - lastWheelNavigation.current < 350) return;
+
+      lastWheelNavigation.current = now;
+      moveIssue(event.deltaY > 0 ? 1 : -1);
+    };
+
+    stage.addEventListener('wheel', handleCarouselWheel, { passive: false });
+    return () => stage.removeEventListener('wheel', handleCarouselWheel);
+  }, [issues.length, moveIssue]);
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] pt-20">
-      {/* Hero Section */}
-      <section className="py-16 px-6 lg:px-8 bg-white">
-        <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen overflow-hidden bg-[#FAFAFA] pt-20">
+      <section className="bg-white px-6 py-16 lg:px-8">
+        <div className="mx-auto max-w-7xl">
           <SectionTitle
             title="Noixorgo"
-            subtitle="Eco Club's official magazine and newsletter"
+            subtitle="Eco Club&apos;s official magazine and newsletter"
           />
         </div>
       </section>
 
-      {/* Featured Banner */}
-      <section className="py-12 px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="bg-white rounded-2xl overflow-hidden shadow-soft">
-            <div className="flex flex-col lg:flex-row">
-              <div className="lg:w-1/2">
-                <img
-                  src={noixorgoData.featured.image}
-                  alt={noixorgoData.featured.title}
-                  className="w-full h-64 lg:h-full object-cover"
-                  loading="lazy"
-                />
+      <section className="px-6 py-12 lg:px-8">
+        <div className="mx-auto max-w-7xl">
+          {activeIssue ? (
+            <>
+              <div className="mb-6 text-center">
+                <p className="text-sm font-medium uppercase tracking-[0.16em] text-[#3FAE5C]">
+                  Noixorgo Issues
+                </p>
+                <p className="mt-2 text-muted" aria-live="polite">
+                  Week {activeIssue.week} · {activeIssue.date}
+                </p>
               </div>
-              <div className="lg:w-1/2 p-8 lg:p-12 flex flex-col justify-center">
-                <span className="text-sm font-medium text-[#3FAE5C] mb-2">Latest Issue</span>
-                <h2 className="text-3xl font-bold text-[#222] mb-4">{noixorgoData.featured.title}</h2>
-                <p className="text-muted mb-6">{noixorgoData.featured.description}</p>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted">{noixorgoData.featured.date}</span>
-                  <a href="#" className="text-[#3FAE5C] font-medium hover:underline">
-                    Read Issue
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
-      {/* Filters and Search */}
-      <section className="py-8 px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-            {/* Category Chips */}
-            <div className="flex flex-wrap gap-3">
-              {categories.map((category) => (
-                <button
-                  key={category}
-                  onClick={() => setActiveCategory(category)}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                    activeCategory === category
-                      ? 'bg-[#3FAE5C] text-white'
-                      : 'bg-white text-[#222] border border-[#ECECEC] hover:border-[#3FAE5C]'
-                  }`}
-                >
-                  {category}
-                </button>
-              ))}
-            </div>
-
-            {/* Search */}
-            <div className="relative w-full md:w-64">
-              <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted" />
-              <input
-                type="search"
-                placeholder="Search articles..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 rounded-xl border border-[#ECECEC] focus:outline-none focus:ring-2 focus:ring-[#3FAE5C] bg-white"
-              />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Articles Grid */}
-      <section className="py-12 px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <motion.div
-            layout
-            className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
-          >
-            {filteredArticles.map((article, index) => (
-              <motion.article
-                key={article.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="group cursor-pointer"
+              <div
+                ref={stageRef}
+                className="noixorgo-stage relative mx-auto w-full max-w-6xl"
+                aria-label="Noixorgo issue carousel"
+                aria-roledescription="carousel"
               >
-                <div className="bg-white rounded-2xl overflow-hidden shadow-card hover-lift h-full flex flex-col">
-                  <div className="relative overflow-hidden">
-                    <img
-                      src={article.image}
-                      alt={article.title}
-                      className="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-105"
-                      loading="lazy"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                  </div>
-                  <div className="p-6 flex flex-col flex-grow">
-                    <h3 className="text-xl font-bold text-[#222] mb-3 group-hover:text-[#3FAE5C] transition-colors">
-                      {article.title}
-                    </h3>
-                    <p className="text-muted mb-4 flex-grow line-clamp-3">{article.excerpt}</p>
-                    <div className="flex items-center justify-between pt-4 border-t border-[#ECECEC]">
-                      <span className="text-sm text-muted">{article.date}</span>
-                      <span className="text-sm font-medium text-[#3FAE5C]">{article.category}</span>
-                    </div>
-                  </div>
-                </div>
-              </motion.article>
-            ))}
-          </motion.div>
+                {issues.map((issue, index) => {
+                  const position = getRelativePosition(index, currentIndex, issues.length);
+                  const isActive = position === 'active';
+                  const isHidden = position === 'hidden';
 
-          {filteredArticles.length === 0 && (
-            <div className="text-center py-12">
-              <p className="text-xl text-muted">No articles found matching your criteria.</p>
-            </div>
+                  return (
+                    <div
+                      key={`${issue.week}-${issue.coverImage}`}
+                      className={`noixorgo-layer ${isHidden ? 'noixorgo-layer-hidden' : ''} ${
+                        prefersReducedMotion ? 'noixorgo-no-motion' : ''
+                      }`}
+                      data-position={position}
+                      aria-hidden={isHidden}
+                    >
+                      {isActive ? (
+                        <article
+                          className="noixorgo-active-card mx-auto w-full"
+                          role="button"
+                          tabIndex={0}
+                          onClick={toggleTip}
+                          onKeyDown={handleActiveCardKeyDown}
+                          aria-label={`Week ${issue.week} issue. ${
+                            showingTip ? 'Showing tip. Click to view cover.' : 'Showing cover. Click to view tip.'
+                          }`}
+                          aria-pressed={showingTip}
+                        >
+                          <div className="relative overflow-hidden rounded-xl border border-[#ECECEC] bg-black shadow-soft">
+                            {index === latestIndex && (
+                              <span className="absolute left-3 top-3 z-10 rounded-full bg-[#3FAE5C] px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white">
+                                Latest issue
+                              </span>
+                            )}
+                            <IssueImage issue={issue} showingTip={showingTip} active />
+                          </div>
+                          <div className="pt-4 text-center">
+                            <h2 className="text-2xl font-bold text-[#222]">Week {issue.week}</h2>
+                            <p className="mt-1 text-sm text-muted">{issue.date}</p>
+                            <p className="mt-3 text-sm font-medium text-[#3FAE5C]">
+                              {showingTip ? 'Click to view cover' : 'Click to view tip'}
+                            </p>
+                          </div>
+                        </article>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => selectIssue(index)}
+                          aria-label={`View Week ${issue.week} issue`}
+                          tabIndex={isHidden ? -1 : 0}
+                          className="noixorgo-background-card block w-full rounded-xl border border-[#ECECEC] bg-black text-left shadow-soft transition-shadow hover:border-[#3FAE5C] hover:shadow-card focus:outline-none focus-visible:ring-2 focus-visible:ring-[#3FAE5C]"
+                        >
+                          <IssueImage issue={issue} showingTip={false} active={false} />
+                          {index === latestIndex && (
+                            <span className="absolute left-3 top-3 rounded-full bg-[#3FAE5C] px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white">
+                              Latest issue
+                            </span>
+                          )}
+                        </button>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="mt-5 flex items-center justify-center gap-4">
+                <button
+                  type="button"
+                  onClick={() => moveIssue(-1)}
+                  aria-label="Previous issue"
+                  className="rounded-full border border-[#ECECEC] bg-white p-2 text-[#222] transition-colors hover:border-[#3FAE5C] hover:text-[#3FAE5C] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#3FAE5C]"
+                >
+                  <FiChevronLeft className="h-5 w-5" aria-hidden="true" />
+                </button>
+                <p className="min-w-24 text-center text-sm text-muted" aria-live="polite">
+                  Issue {currentIndex + 1} of {issues.length}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => moveIssue(1)}
+                  aria-label="Next issue"
+                  className="rounded-full border border-[#ECECEC] bg-white p-2 text-[#222] transition-colors hover:border-[#3FAE5C] hover:text-[#3FAE5C] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#3FAE5C]"
+                >
+                  <FiChevronRight className="h-5 w-5" aria-hidden="true" />
+                </button>
+              </div>
+            </>
+          ) : (
+            <p className="py-12 text-center text-xl text-muted">
+              No Noixorgo issues are available.
+            </p>
           )}
         </div>
       </section>
